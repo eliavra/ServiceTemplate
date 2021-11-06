@@ -6,8 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Template.Infrastructure.Identity;
-using Template.Infrastructure.Identity.Models;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -36,12 +34,6 @@ namespace Template.WebApi
                 var loggerFactory = services.GetRequiredService<ILoggerFactory>();
                 try
                 {
-                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-                    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-
-                    await Infrastructure.Identity.Seeds.DefaultRoles.SeedAsync(userManager, roleManager);
-                    await Infrastructure.Identity.Seeds.DefaultSuperAdmin.SeedAsync(userManager, roleManager);
-                    await Infrastructure.Identity.Seeds.DefaultBasicUser.SeedAsync(userManager, roleManager);
                     Log.Information("Finished Seeding Default Data");
                     Log.Information("Application Starting");
                 }

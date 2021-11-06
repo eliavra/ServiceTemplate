@@ -4,12 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Template.Application;
-using Template.Application.Interfaces;
-using Template.Infrastructure.Identity;
-using Template.Infrastructure.Persistence;
-using Template.Infrastructure.Shared;
 using Template.WebApi.Extensions;
-using Template.WebApi.Services;
 
 namespace Template.WebApi
 {
@@ -23,14 +18,10 @@ namespace Template.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddApplicationLayer();
-            services.AddIdentityInfrastructure(_config);
-            services.AddPersistenceInfrastructure(_config);
-            services.AddSharedInfrastructure(_config);
             services.AddSwaggerExtension();
             services.AddControllers();
             services.AddApiVersioningExtension();
             services.AddHealthChecks();
-            services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
