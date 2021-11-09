@@ -1,0 +1,14 @@
+{
+	"Serilog": {
+		"Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File" ],
+		"SeqServerUrl": null,
+		"LogstashgUrl": null,
+		"MinimumLevel": {
+			"Default": "Debug",
+			"Override": {
+				"Microsoft": "Warning",
+				"System": "Warning"
+			}
+		}
+	}
+}

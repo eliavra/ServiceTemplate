@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Template.Application;
+using Template.REST.Extensions;
 using Template.WebApi.Extensions;
 
 namespace Template.WebApi
@@ -17,11 +18,13 @@ namespace Template.WebApi
         }
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationLayer();
+            services.AddLogger();
+            services.AddRestControllers();
             services.AddSwaggerExtension();
-            services.AddControllers();
+            services.AddAppConfiguration(_config);
             services.AddApiVersioningExtension();
             services.AddHealthChecks();
+            services.AddAutofacDependencyInjection();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -37,8 +40,6 @@ namespace Template.WebApi
             }
             app.UseHttpsRedirection();
             app.UseRouting();
-            app.UseAuthentication();
-            app.UseAuthorization();
             app.UseSwaggerExtension();
             app.UseErrorHandlingMiddleware();
             app.UseHealthChecks("/health");

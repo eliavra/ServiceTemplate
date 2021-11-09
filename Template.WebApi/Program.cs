@@ -7,46 +7,81 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Template.WebApi
 {
     public class Program
     {
+
+        public static readonly string Namespace = typeof(Program).Namespace;
+        public static readonly string AppName = Namespace.Substring(Namespace.LastIndexOf('.', Namespace.LastIndexOf('.') - 1) + 1);
+
         public async static Task Main(string[] args)
         {
-            //Read Configuration from appSettings
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-            //Initialize Logger
             Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(config)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information).Enrich
+                .FromLogContext().WriteTo
+                .Console()
                 .CreateLogger();
-            var host = CreateHostBuilder(args).Build();
-            using (var scope = host.Services.CreateScope())
+
+            try
             {
-                var services = scope.ServiceProvider;
-                var loggerFactory = services.GetRequiredService<ILoggerFactory>();
-                try
+                var config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
+                                                       .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                                                       .AddJsonFile("serilogSettings.json", optional: false, reloadOnChange: true)
+                                                       .AddEnvironmentVariables()
+                                                       .Build();
+                var host = CreateHostBuilder(args).Build();
+                using (var scope = host.Services.CreateScope())
                 {
-                    Log.Information("Finished Seeding Default Data");
-                    Log.Information("Application Starting");
+                    var services = scope.ServiceProvider;
+                    var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+                    try
+                    {
+                        Log.Information("Finished Seeding Default Data");
+                        Log.Information("Application Starting");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Warning(ex, "An error occurred seeding the DB");
+                    }
+                    finally
+                    {
+                        Log.CloseAndFlush();
+                    }
                 }
-                catch (Exception ex)
+                host.Run();
+            }
+            catch (Exception ex)
+            {
+                if (Log.Logger != null)
                 {
-                    Log.Warning(ex, "An error occurred seeding the DB");
+                    Log.Fatal(ex, "terminated unexpectedly {AppName}", AppName);
                 }
-                finally
+                else
                 {
-                    Log.CloseAndFlush();
+                    Log.Fatal(ex, "Host terminated unexpectedly {AppName}", AppName);
                 }
             }
-            host.Run();
+            finally
+            {
+                Log.CloseAndFlush();
+
+                // For datadog will able to catch up the error
+                Thread.Sleep((int)TimeSpan.FromSeconds(10).TotalMilliseconds);
+            }
+
+
+
+            //Read Configuration from appSettings
+
         }
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
