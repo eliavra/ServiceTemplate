@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Template.REST.Controllers;
 
-namespace Template.WebApi.Controllers
+namespace Template.REST.Controllers
 {
     public class MetaController : BaseApiController
     {

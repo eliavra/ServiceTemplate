@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 
-namespace Template.WebApi.Controllers
+namespace Template.REST.Controllers
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]

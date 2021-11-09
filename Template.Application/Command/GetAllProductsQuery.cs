@@ -4,7 +4,7 @@ namespace Template.Application.Command
 {
     public class GetAllProductsQuery : IRequest<object>
     {
-        public object PageSize { get; set; }
-        public object PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public int PageNumber { get; set; }
     }
 }
